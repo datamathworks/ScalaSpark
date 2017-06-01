@@ -1,12 +1,9 @@
 package wikipedia
 
-import org.scalatest.{FunSuite, BeforeAndAfterAll}
+import courses.coursera.fp.fp4.week1.{WikipediaArticle, WikipediaRanking}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
+import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 @RunWith(classOf[JUnitRunner])
 class WikipediaSuite extends FunSuite with BeforeAndAfterAll {
