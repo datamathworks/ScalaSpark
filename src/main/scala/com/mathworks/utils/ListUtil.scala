@@ -19,7 +19,7 @@ package com.mathworks.utils
   * xs take n                  A list consisting of the first n elements of xs (or xs itself if shorter than n)
   * xs drop n                  The rest of the collection after taking n elements
   * xs(n)                      The element of xs at index n (also written as xs apply n)
-  * 
+  *
   */
 
 object ListUtil {
@@ -30,11 +30,23 @@ object ListUtil {
   List(2, 3) // list with elements 2 and 3
 
   // :: -> constructor operation (cons)
-  val fruits: List[String] = List("apples", "oranges", "pears") = "apples" :: "oranges" :: "pears" :: Nil
+  var fruits: List[String] = List("apples", "oranges", "pears") // "apples" :: "oranges" :: "pears" :: Nil
   fruits.head == "apples"
   fruits.tail ==  List("oranges", "pears")
 
-  List(1, 2, 3, 4) = 1 :: 2 :: 3 :: 4 :: Nil
+  List(1, 2, 3, 4) // = 1 :: 2 :: 3 :: 4 :: Nil
+  /**
+    * Returns the last element of a list
+    *
+    * @param xs
+    * @tparam T
+    * @return
+    */
+  def last[T](xs: List[T]): T = xs match {
+    case List() => throw new Error("last of empty list")
+    case List(x) => x
+    case y :: ys => last(ys)
+  }
 
 
 }
