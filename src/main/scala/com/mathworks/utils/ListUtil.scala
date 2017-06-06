@@ -48,5 +48,65 @@ object ListUtil {
     case y :: ys => last(ys)
   }
 
+  /**
+    * Returns all the elements except the last one from a given list
+    *
+    * @param xs
+    * @tparam T
+    * @return
+    */
+  def init[T](xs: List[T]): List[T] = xs match {
+    case List() => throw new Error("init of empty list")
+    case List(x) => List()
+    case y :: ys => y :: init(ys)
+  }
 
+  /**
+    * xs ::: ys
+    *
+    * @param xs
+    * @param ys
+    * @tparam T
+    * @return
+    */
+  def concat[T](xs: List[T], ys: List[T]): List[T] = xs match {
+    case List() => ys
+    case List(x) => x :: ys
+    case z :: zs => z :: concat(zs, ys)
+  }
+
+  /**
+    * reverse a list
+    *
+    * @param xs
+    * @tparam T
+    * @return
+    */
+  def reverse[T](xs: List[T]): List[T] = xs match {
+    case List() => List()
+    case List(x) => List(x)
+    case y :: ys => reverse(ys) ::: List(y)
+  }
+
+  /**
+    * remove the nth element from the list
+    *
+    * @param n
+    * @param xs
+    * @tparam T
+    * @return
+    */
+  def removeAt[T](n: Int, xs: List[T]): List[T] = (xs take n) ::: (xs drop n + 1)
+
+  /**
+    * multiply each element of a list by a factor
+    *
+    * @param xs
+    * @param factor
+    * @return
+    */
+  def scaleList(xs: List[Double], factor: Double): List[Double] = xs match {
+    case List() => List()
+    case y :: ys => (y * factor) :: scaleList(ys, factor)
+  }
 }
