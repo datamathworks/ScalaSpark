@@ -7,9 +7,9 @@ object SparkUtil {
     *  its elements
     */
 
-  val a = sc.parallelize (List(1, 2, 3, 4, 5)
+/*  val a = sc.parallelize (List(1, 2, 3, 4, 5)
 
-  a take 3 foreach println
+  a take 3 foreach println*/
 
   // This will print  1
   //                  2
