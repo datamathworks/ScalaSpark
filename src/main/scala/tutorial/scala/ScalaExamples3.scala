@@ -7,6 +7,8 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.text.SimpleDateFormat
 
+import scala.util.Random
+
 
 object ScalaExamples3 extends App {
   val now = new Date
@@ -364,4 +366,292 @@ object ScalaExamples3 extends App {
     }
   }
 
+  // Create Function With Option Return Type
+
+  // define a function which returns an Option of type String
+  def dailyCouponCode(): Option[String] = {
+    // look up in database if we will provide our customers with a coupon today
+    val couponFromDb = "COUPON_1234"
+    Option(couponFromDb).filter(_.nonEmpty)
+
+  }
+
+  // call function with Option return type using getOrElse
+  val todayCoupon: Option[String] = dailyCouponCode()
+  println(s"Today's coupon code = ${todayCoupon.getOrElse("No Coupon's Today")}")
+
+  // call a function with Option return type using pattern matching
+  dailyCouponCode() match {
+    case Some(couponCode) => println(s"Today's coupon code = $couponCode")
+    case None => println(s"Sorry there is no coupon code today!")
+  }
+
+  // call function with Option return type using map() function
+  dailyCouponCode().map(couponCode => println(s"Today's coupon code = $couponCode"))
+
+  def calculateDonutCost1(donutName: String, quantity: Int, couponCode: Option[String]): Double = {
+    println(s"Calculating cost for $donutName, quantity = $quantity")
+
+    couponCode match {
+      case Some(coupon) =>
+        val discount = 0.1 // Let's simulate a 10% discount
+      val totalCost = 2.50 * quantity * (1 - discount)
+        totalCost
+
+      case None => 2.50 * quantity
+    }
+  }
+
+  println(s"""Total cost with daily coupon code = ${calculateDonutCost1("Glazed Donut", 5, dailyCouponCode())}""")
+
+  // define a function which has an implicit parameter
+  def totalCost(donutType: String, quantity: Int)(implicit discount: Double): Double = {
+    println(s"Calculating the price for $quantity $donutType")
+    val totalCost = 2.50 * quantity * (1 - discount)
+    totalCost
+  }
+
+  // define an implicit value
+  implicit val discount: Double = 0.1
+  println(s"All customer will receive a ${discount * 100}% discount")
+
+  // How to call a function which has an implicit parameter
+  println("\nStep 3: How to call a function which has an implicit parameter")
+  println(s"""Total cost with discount of 5 Glazed Donuts = ${totalCost("Glazed Donut", 5)}""")
+
+  // How to define a function which takes multiple implicit parameters
+  def totalCost2(donutType: String, quantity: Int)(implicit discount: Double, storeName: String): Double = {
+    println(s"[$storeName] Calculating the price for $quantity $donutType")
+    val totalCost = 2.50 * quantity * (1 - discount)
+    totalCost
+  }
+
+  // How to call a function which takes multiple implicit parameters
+  implicit val storeName: String = "Tasty Donut Store"
+  println(s"""Total cost with discount of 5 Glazed Donuts = ${totalCost2("Glazed Donut", 5)}""")
+
+  // How to manually pass-through implicit parameters
+  println("\nStep 6: How to manually pass-through implicit parameters")
+  println(s"""Total cost with discount of 5 Glazed Donuts, manually passed-through = ${totalCost2("Glazed Donut", 5)(0.1, "Scala Donut Store")}""")
+
+  // How To Create Implicit Function
+
+  // How to create a wrapper String class which will extend the String type
+  class DonutString(s: String) {
+    def isFavoriteDonut: Boolean = s == "Glazed Donut"
+  }
+
+  // How to create an implicit function to convert a String to the wrapper String class
+  object DonutConverstions {
+    implicit def stringToDonutString(s: String) = new DonutString(s)
+  }
+
+  // How to import the String conversion so that it is in scope
+  import DonutConverstions._
+
+  // How to create String values
+  val glazedDonut = "Glazed Donut"
+  val vanillaDonut = "Vanilla Donut"
+
+  // How to access the custom String function called isFavoriteDonut
+  println(s"Is Glazed Donut my favorite Donut = ${glazedDonut.isFavoriteDonut}")
+  println(s"Is Vanilla Donut my favorite Donut = ${vanillaDonut.isFavoriteDonut}")
+
+  // How To Create Typed Function
+
+  // How to define a function which takes a String parameter
+  def applyDiscount(couponCode: String) {
+    println(s"Lookup percentage discount in database for $couponCode")
+  }
+
+  // How to define a function which takes a parameter of type Double
+  def applyDiscount(percentageDiscount: Double) {
+    println(s"$percentageDiscount discount will be applied")
+  }
+
+  // Calling applyDiscount function with String or Double parameter type
+  applyDiscount("COUPON_1234")
+  applyDiscount(10)
+
+  // How to define a generic typed function which will specify the type of its parameter
+  def applyDiscount[T](discount: T) {
+    discount match {
+      case d: String =>
+        println(s"Lookup percentage discount in database for $d")
+
+      case d: Double =>
+        println(s"$d discount will be applied")
+
+      case _ =>
+        println("Unsupported discount type")
+    }
+  }
+
+  // How to call a function which has typed parameters
+  applyDiscount[String]("COUPON_123")
+  applyDiscount[Double](10)
+
+  // How to define a polymorphic typed function which also has a generic return type
+  def applyDiscountWithReturnType[T](discount: T): Seq[T] = {
+    discount match {
+      case d: String =>
+        println(s"Lookup percentage discount in database for $d")
+        Seq[T](discount)
+
+      case d: Double =>
+        println(s"$d discount will be applied")
+        Seq[T](discount)
+
+      case d @ _ =>
+        println("Unsupported discount type")
+        Seq[T](discount)
+    }
+  }
+
+  // How to call a generic polymorphic function which also has a generic return type
+  println(s"Result of applyDiscountWithReturnType with String parameter = ${applyDiscountWithReturnType[String]("COUPON_123")}")
+
+  println()
+  println(s"Result of applyDiscountWithReturnType with Double parameter = ${applyDiscountWithReturnType[Double](10.5)}")
+
+  println()
+  println(s"Result of applyDiscountWithReturnType with Char parameter = ${applyDiscountWithReturnType[Char]('U')}")
+
+  // How To Create Variable Argument Function - varargs _: *
+
+  // How to define function which takes variable number of arguments
+  def printReport(names: String*) {
+    println(s"""Donut Report = ${names.mkString(", ")}""")
+  }
+
+  // How to call function which takes variable number of String arguments
+  printReport("Glazed Donut", "Strawberry Donut", "Vanilla Donut")
+  printReport("Chocolate Donut")
+
+  // How to pass a List to a function with variable number of arguments
+  val listDonuts: List[String] = List("Glazed Donut", "Strawberry Donut", "Vanilla Donut")
+  printReport(listDonuts: _*)
+
+  // How to pass a Sequence to a function with variable number of arguments
+  val seqDonuts: Seq[String] = Seq("Chocolate Donut", "Plain Donut")
+  printReport(seqDonuts: _*)
+
+  // How to pass an Array to a function with variable number of arguments
+  val arrDonuts: Array[String] = Array("Coconut Donut")
+  printReport(arrDonuts: _*)
+
+  // Learn How To Create Function Currying With Parameter Groups
+
+  // How to define function with curried parameter groups
+  def totalCost1(donutType: String)(quantity: Int)(discount: Double): Double = {
+    println(s"Calculating total cost for $quantity $donutType with ${discount * 100}% discount")
+    val totalCost = 2.50 * quantity
+    totalCost - (totalCost * discount)
+  }
+
+  // How to call a function with curried parameter groups
+  println(s"Total cost = ${totalCost1("Glazed Donut")(10)(0.1)}")
+
+  // How to create a partial function from a function with curried parameter groups
+  val totalCostForGlazedDonuts = totalCost1("Glazed Donut") _
+
+  // How to call a partial function
+  println(s"\nTotal cost for Glazed Donuts ${totalCostForGlazedDonuts(10)(0.1)}")
+
+  // How to define a higher order function which takes another function as parameter
+  //  A Higher Order Function is a function which takes another function as its parameters.
+  def totalCostWithDiscountFunctionParameter(donutType: String)(quantity: Int)(f: Double => Double): Double = {
+    println(s"Calculating total cost for $quantity $donutType")
+    val totalCost = 2.50 * quantity
+    f(totalCost)
+  }
+
+  // How to call higher order function and pass an anonymous function as parameter
+  val totalCostOf5Donuts = totalCostWithDiscountFunctionParameter("Glazed Donut")(5){totalCost =>
+    val discount = 2 // assume you fetch discount from database
+    totalCost - discount
+  }
+  println(s"Total cost of 5 Glazed Donuts with anonymous discount function = $totalCostOf5Donuts")
+
+  // How to define and pass a function to a higher order function
+  def applyDiscount1(totalCost: Double): Double = {
+    val discount = 2 // assume you fetch discount from database
+    totalCost - discount
+  }
+
+  println(s"Total cost of 5 Glazed Donuts with discount function = ${totalCostWithDiscountFunctionParameter("Glazed Donut")(5)(applyDiscount1(_))}")
+
+  // Learn How To Create Higher Order Function - Call-By-Name Function
+
+  // How to define a List with Tuple3 elements
+  val listOrders = List(("Glazed Donut", 5, 2.50), ("Vanilla Donut", 10, 3.50))
+
+  // How to define a function to loop through each Tuple3 elements of the List and calculate total cost
+  def placeOrder(orders: List[(String, Int, Double)])(exchangeRate: Double): Double = {
+    var totalCost: Double = 0.0
+    orders.foreach {order =>
+      val costOfItem = order._2 * order._3 * exchangeRate
+      println(s"Cost of ${order._2} ${order._1} = £$costOfItem")
+      totalCost += costOfItem
+    }
+    totalCost
+  }
+
+  println(s"Total cost of order = £${placeOrder(listOrders)(0.5)}")
+
+  // How to define a call-by-name function
+  def placeOrderWithByNameParameter(orders: List[(String, Int, Double)])(exchangeRate: => Double): Double = {
+    var totalCost: Double = 0.0
+    orders.foreach {order =>
+      val costOfItem = order._2 * order._3 * exchangeRate
+      println(s"Cost of ${order._2} ${order._1} = £$costOfItem")
+      totalCost += costOfItem
+    }
+    totalCost
+  }
+
+  // How to define a simple USD to GBP function
+  val randomExchangeRate = new Random(10)
+  def usdToGbp: Double = {
+    val rate = randomExchangeRate.nextDouble()
+    println(s"Fetching USD to GBP exchange rate = $rate")
+    rate
+  }
+
+  // How to call function with call-by-name parameter
+  println(s"Total cost of order = £${placeOrderWithByNameParameter(listOrders)(usdToGbp)}")
+
+  // Learn How To Create Higher Order Function - Callback Function Parameter
+
+  // How to define a function with a callback parameter
+  def printReport(sendEmailCallback: () => Unit) {
+    println("Printing report ... started")
+    // look up some data in database and create a report
+    println("Printing report ... finished")
+    sendEmailCallback()
+  }
+
+  // How to call a function which has a callback parameter
+  printReport(() =>
+    println("Sending email ... finished")
+  )
+
+  // How to call a function without providing its callback parameter
+  printReport(() => {})
+
+  // How to define a function with an Option callback
+  def printReportWithOptionCallback(sendEmailCallback: Option[() => Unit] = None) {
+    println("Printing report ... started")
+    // look up some data in database and create a report
+    println("Printing report ... finished")
+    sendEmailCallback.map(callback => callback())
+  }
+
+  // How to call a function without providing its callback parameter
+  printReportWithOptionCallback()
+
+  // How to call a function with Option callback parameter
+  printReportWithOptionCallback(Some(() =>
+    println("Sending email wrapped in Some() ... finished")
+  ))
 }
